@@ -528,6 +528,7 @@ ifs.open("text.txt", ios::in);
 
 if (!ifs.is_open()) {
 	cout << "failed to open text.txt" << endl;
+    return;
 }
 
 //读文件——只会一个单词一个单词输出
