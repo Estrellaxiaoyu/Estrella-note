@@ -519,7 +519,7 @@ C 库函数 **int atoi(const char \*str)** 把参数 **str** 所指向的字符�
 
 
 
-## 读文件
+## 读文件1
 
 ```c++
 ifstream ifs;
@@ -557,6 +557,46 @@ while ((c = ifs.get()) != EOF) {//EOF end of file
 
 ifs.close();
 ```
+
+
+
+## 读文件2
+
+```c++
+class person {
+public:
+	char m_name[100];
+	int m_age;
+};
+
+int main() {
+	person p = { "张三",18 };
+
+	//ofstream ofs;
+	//ofs.open("class_write_test.txt", ios::out|ios::binary);
+
+	//ofs.write((const char*)&p, sizeof(person));
+
+	//ofs.close();
+
+	ifstream ifs;
+	ifs.open("class_write_test.txt", ios::in | ios::binary);
+
+	if (!ifs.is_open()) {
+		cout << "failed to open txt" << endl;
+		return NULL;
+	}
+
+	ifs.read((char*)&p, sizeof(person));
+	cout << p.m_age << " " << p.m_name << endl;
+
+	ifs.close();
+
+	return 0;
+}
+```
+
+
 
 
 
