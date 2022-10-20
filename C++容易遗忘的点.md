@@ -10,6 +10,8 @@
 
 <img src="C++容易遗忘的点.assets/image-20220924201412121.png" alt="image-20220924201412121" style="zoom: 50%;" />
 
+`#Pragma once`也可以
+
 
 
 ## 头文件布局
