@@ -259,7 +259,7 @@ cout<<setfill('*')<<setw(10)<<a<<" "<<setw(10)<<b;
 
 ## setprecision(x)函数
 
-- 要求保留两位小数，可以用到 `cout<<fixed<<setprecision(x)<<a<<endl;`，意思是输出 a*a*，保留 x*x* 位小数。
+- 要求保留x位小数，可以用到 `cout<<fixed<<setprecision(x)<<a<<endl;`，意思是输出 a*a*，保留 x*x* 位小数。
 - 配合**fixed**使用
 
 
@@ -613,5 +613,11 @@ int main() {
 ![image-20221027231917924](C++容易遗忘的点.assets/image-20221027231917924.png)
 
 
+
+
+
+## emplace_back()和push_back()的区别
+
+push_back() 向容器尾部添加元素时，首先会创建这个元素，然后再将这个元素拷贝或者移动到容器中（如果是拷贝的话，事后会自行销毁先前创建的这个元素）；而emplace_back() 在实现时，则是直接在容器尾部创建这个元素，省去了拷贝或移动元素的过程。
 
 # end
