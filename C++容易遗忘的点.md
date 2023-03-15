@@ -640,4 +640,14 @@ push_back() 向容器尾部添加元素时，首先会创建这个元素，然�
 
 
 
+
+
+## 深拷贝自我赋值检测
+
+<img src="C++容易遗忘的点.assets/image-20230315000106058.png" alt="image-20230315000106058" style="zoom: 50%;" />
+
++ why
+
+<img src="C++容易遗忘的点.assets/image-20230315000453571.png" alt="image-20230315000453571" style="zoom: 33%;" />
+
 # end
