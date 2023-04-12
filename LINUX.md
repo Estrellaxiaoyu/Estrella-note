@@ -934,7 +934,7 @@
 
 
 
-# 定制自己的Linux-3
+# 定制自己的Linux
 
 ## 基本介绍
 
@@ -958,7 +958,7 @@
 
 
 
-# Linux内核源码&内核升级-4
+# Linux内核源码&内核升级
 
 ## 为什么要阅读Linux内核
 
@@ -990,15 +990,85 @@
 
 
 
-# 备份与恢复介绍-4
+# 备份与恢复介绍
 
-p133-136
+## 基本介绍
+
+![image-20230412155440078](LINUX.assets/image-20230412155440078.png)
 
 
 
-# Linux可视化管理 webmin和bt运维工具-5
+## 安装dump和restore
 
-p137-141
+![image-20230412155619597](LINUX.assets/image-20230412155619597.png)
+
+
+
+## 用dump完成备份
+
+### 基本介绍
+
+![image-20230412160222768](LINUX.assets/image-20230412160222768.png)
+
+### 应用案例
+
+![image-20230412160525841](LINUX.assets/image-20230412160525841.png)
+
+### dump -W
+
+![image-20230412160646181](LINUX.assets/image-20230412160646181.png)
+
+### dump备份文件或目录-不支持增量备份
+
+![image-20230412161112939](LINUX.assets/image-20230412161112939.png)
+
+
+
+## 用restore完成恢复
+
+### 基本介绍和基本语法
+
+![image-20230412161546683](LINUX.assets/image-20230412161546683.png)
+
+
+
+### 应用案例
+
+#### 比较模式
+
+![image-20230412161707514](LINUX.assets/image-20230412161707514.png)
+
+#### 查看模式
+
+![image-20230412162559818](LINUX.assets/image-20230412162559818.png)
+
+#### 还原模式
+
+![image-20230412162539292](LINUX.assets/image-20230412162539292.png)
+
+![image-20230412162518745](LINUX.assets/image-20230412162518745.png)
+
+
+
+
+
+# Linux可视化管理 webmin和bt运维工具\
+
+## bt
+
+### bt安装
+
+![image-20230412170346021](LINUX.assets/image-20230412170346021.png)
+
+![image-20230412170318243](LINUX.assets/image-20230412170318243.png)
+
+### 查看用户密码等
+
+![image-20230412170411998](LINUX.assets/image-20230412170411998.png)
+
+
+
+
 
 
 

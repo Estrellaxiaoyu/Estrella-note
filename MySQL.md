@@ -64,17 +64,17 @@
 
 ## DML
 
-### 添加数据
+### 添加数据-insert
 
 ![image-20230327211719068](MySQL.assets/image-20230327211719068.png)
 
 
 
-### 修改数据
+### 修改数据-update
 
 ![image-20230327213615300](MySQL.assets/image-20230327213615300.png)
 
-### 删除数据
+### 删除数据-delete
 
 ![image-20230327214340341](MySQL.assets/image-20230327214340341.png)	
 
@@ -492,7 +492,7 @@
 ![image-20230410161639930](MySQL.assets/image-20230410161639930.png)
 
 + 区别
-  + InnoDB与MyISAM的区别：事务，外键，行级锁
+  + InnoDB与MyISAM的区别：==**事务，外键，行级锁**==
 
 ![image-20230410161818780](MySQL.assets/image-20230410161818780.png)
 
@@ -749,6 +749,93 @@
 
 
 
+# SQL优化
+
+
+
+## 插入数据
+
+### insert优化-批量插入
+
++ 批量插入、手动提交事务、主键顺序插入
+
+![image-20230412192852718](MySQL.assets/image-20230412192852718.png)
+
+
+
+### 大批量插入数据
+
+![image-20230412194111435](MySQL.assets/image-20230412194111435.png)
+
+
+
+## 主键优化
+
+### 数据组织方式
+
+![image-20230412194347795](MySQL.assets/image-20230412194347795.png)
+
+![image-20230412194410128](MySQL.assets/image-20230412194410128.png)
+
+### 主键乱序==插入==会出先==页分裂==
+
+![image-20230412194650226](MySQL.assets/image-20230412194650226.png)
+
+### ==删除==时会出现==页合并==
+
+![image-20230412194848674](MySQL.assets/image-20230412194848674.png)
+
+
+
+### 主键设计原则
+
+![image-20230412195231586](MySQL.assets/image-20230412195231586.png)
+
+## order by优化
+
+![image-20230412200056847](MySQL.assets/image-20230412200056847.png)
+
+![image-20230412200212488](MySQL.assets/image-20230412200212488.png)
+
+
+
+
+
+## group by优化
+
+![image-20230412200656094](MySQL.assets/image-20230412200656094.png)
+
+
+
+## limit优化
+
+![image-20230412201442068](MySQL.assets/image-20230412201442068.png)
+
+
+
+
+
+## count优化
+
+### 优化思路
+
+![image-20230412201708895](MySQL.assets/image-20230412201708895.png)
+
+### count的几种用法及效率
+
+![image-20230412202143012](MySQL.assets/image-20230412202143012.png)
+
+![image-20230412202325761](MySQL.assets/image-20230412202325761.png)
+
+
+
+
+
+## update优化
+
++ InooDB中用索引行锁，反之表锁
+
+![image-20230412203322640](MySQL.assets/image-20230412203322640.png)
 
 
 
@@ -756,18 +843,60 @@
 
 
 
+# 视图
 
-# SQL优化--3
+## 介绍
 
-8
+![image-20230412210803820](MySQL.assets/image-20230412210803820.png)
+
+## 视图创建，查询，修改，删除
+
+![image-20230412211534987](MySQL.assets/image-20230412211534987.png)
+
+
+
+## 视图的检查选项 cascaded/local
+
++ cascaded：级联
+  + 会将上层依赖的视图都加上with cascaded check option；
+
+![image-20230412212525743](MySQL.assets/image-20230412212525743.png)
+
++ local
+  + 不会将上层依赖的视图加with local check option; 但是会检查上层（是否有选择选项等）
+
+![image-20230412212710748](MySQL.assets/image-20230412212710748.png)
+
+
+
+## 视图的更新
+
+![image-20230412213322542](MySQL.assets/image-20230412213322542.png)
+
+## 视图的作用
+
+![image-20230412213614608](MySQL.assets/image-20230412213614608.png)
+
++ 数据独立
+  + 若基表中列改名了，可以如下图保证视图的列名不变
+
+![image-20230412213722313](MySQL.assets/image-20230412213722313.png)
+
+
+
+## 案例
+
+![image-20230412213941942](MySQL.assets/image-20230412213941942.png)
+
+
+
+# 存储过程--4
 
 
 
 
 
-
-
-# 视图--3
+# 触发器--4
 
 5
 
@@ -775,23 +904,7 @@
 
 
 
-# 存储过程--3
-
-4
-
-
-
-
-
-# 触发器--3
-
-5
-
-
-
-
-
-# 锁--4
+# 锁--5
 
 12
 
@@ -799,7 +912,7 @@
 
 
 
-# InnoDB引擎--4
+# InnoDB引擎--6
 
 15
 
@@ -807,7 +920,7 @@
 
 
 
-# MySQL管理--5
+# MySQL管理--6
 
 4
 
