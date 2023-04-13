@@ -843,7 +843,7 @@
 
 
 
-# 视图
+# 视图-view
 
 ## 介绍
 
@@ -890,15 +890,191 @@
 
 
 
-# 存储过程--4
+# 存储过程-procedure
+
+## 介绍&特点&基本语法
+
++ 事先定义并存储在数据库中的一段SQL逻辑
+
+![image-20230413100655318](MySQL.assets/image-20230413100655318.png)
+
++ 特点
+  + 封装，复用
+  + 可以接收参数，也可以返回数据
+  + 减少网络交互，效率提升
+
+![image-20230413101339267](MySQL.assets/image-20230413101339267.png)
+
+![image-20230413102738514](MySQL.assets/image-20230413102738514.png)
+
+![image-20230413102942830](MySQL.assets/image-20230413102942830.png)
+
+
+
+## 流程控制
+
+### 变量
+
+#### 系统变量
+
+![image-20230413105239386](MySQL.assets/image-20230413105239386.png)
 
 
 
 
 
-# 触发器--4
+#### 用户定义变量
 
-5
+![image-20230413105631063](MySQL.assets/image-20230413105631063.png)
+
+
+
+
+
+#### 局部变量
+
+![image-20230413110116909](MySQL.assets/image-20230413110116909.png)
+
++ #### 用 := 赋值
+
+
+
+### if判断
+
+![image-20230413110524209](MySQL.assets/image-20230413110524209.png)
+
+### 参数
+
+![image-20230413110703856](MySQL.assets/image-20230413110703856.png)
+
+![image-20230413111625637](MySQL.assets/image-20230413111625637.png)
+
+
+
+### case
+
++ 与流程控制中的函数类似
++ 语法一和switch类似
++ 语法二和if else类似
+
+![image-20230413112220372](MySQL.assets/image-20230413112220372.png)
+
++ **练习**
+
+![image-20230413113346975](MySQL.assets/image-20230413113346975.png)
+
+
+
+### 循环
+
+#### while
+
+![image-20230413162245968](MySQL.assets/image-20230413162245968.png)
+
+![image-20230413163953316](MySQL.assets/image-20230413163953316.png)
+
+
+
+
+
+#### repeat
+
++ 满足条件则退出循环
+
++ 先判断一次在进行循环
+
+![image-20230413162327031](MySQL.assets/image-20230413162327031.png)
+
+![image-20230413163951475](MySQL.assets/image-20230413163951475.png)
+
+
+
+
+
+#### loop
+
+![image-20230413163019711](MySQL.assets/image-20230413163019711.png)
+
+![image-20230413163944328](MySQL.assets/image-20230413163944328.png)
+
+
+
+
+
+### 游标cursor
+
++ 局部变量不能接收一个表的内容
++ 游标可以存储查询结果集
+
+![image-20230413164250669](MySQL.assets/image-20230413164250669.png)
+
+![image-20230413165004949](MySQL.assets/image-20230413165004949.png)
+
+<img src="MySQL.assets/image-20230413165244102.png" alt="image-20230413165244102" style="zoom:50%;" />
+
+
+
+#### 条件处理程序handler
+
++ 配合游标cursor使用
+
+![image-20230413165444349](MySQL.assets/image-20230413165444349.png)
+
+<img src="MySQL.assets/image-20230413165832243.png" alt="image-20230413165832243" style="zoom:50%;" />
+
+<img src="MySQL.assets/image-20230413165905165.png" alt="image-20230413165905165" style="zoom:50%;" />
+
+
+
+## 存储函数
+
+> 有返回的存储过程，参数类型只能是in
+
++ 比较少用
+  + 因为存储函数能做的事情存储过程也能做，而且存储函数需要返回值
+
+![image-20230413170133512](MySQL.assets/image-20230413170133512.png)
+
+
+
+# 触发器-trigger
+
+## 介绍
+
++ 可以确保数据完整性、日志记录、数据检验
+
+<img src="MySQL.assets/image-20230413171240665.png" alt="image-20230413171240665" style="zoom:67%;" />
+
++ 行级触发器表示操作了某行而触发
++ 语句触发器表示执行了某条语句，例如update而触发
+
+
+
+## 语法
+
+![image-20230413171557581](MySQL.assets/image-20230413171557581.png)
+
+
+
+## 案例
+
++ **通过触发器记录表的变更日志**
+
+![image-20230413172217154](MySQL.assets/image-20230413172217154.png)
+
+### 插入触发器
+
+![image-20230413172626101](MySQL.assets/image-20230413172626101.png)
+
+### 修改触发器
+
+![image-20230413172928603](MySQL.assets/image-20230413172928603.png)
+
+### 删除触发器
+
+![image-20230413173259613](MySQL.assets/image-20230413173259613.png)
+
+
 
 
 
