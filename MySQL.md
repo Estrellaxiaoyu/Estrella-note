@@ -833,7 +833,7 @@
 
 ## update优化
 
-+ InooDB中用索引行锁，反之表锁
++ InooDB中用索引行级锁，反之表锁
 
 ![image-20230412203322640](MySQL.assets/image-20230412203322640.png)
 
@@ -1080,29 +1080,404 @@
 
 
 
-# 锁--5
+# 锁
 
-12
+## 介绍和分类
 
+![image-20230415110143532](MySQL.assets/image-20230415110143532.png)
 
-
-
-
-# InnoDB引擎--6
-
-15
+![image-20230415110233907](MySQL.assets/image-20230415110233907.png)
 
 
 
+## 全局锁
+
+### 介绍
+
++ 获取一致性视图，保证数据的完整性	
+
+![image-20230415110607810](MySQL.assets/image-20230415110607810.png)
+
++ **加了全局锁后**
+
+![image-20230415110814525](MySQL.assets/image-20230415110814525.png)
 
 
-# MySQL管理--6
 
-4
+### 语法和演示
+
++ mysqldump是MySQL提供的命令，在命令行使用
++ flush tables with read lock
+
+![image-20230415110925175](MySQL.assets/image-20230415110925175.png)
+
+### 特点
+
+![image-20230415111618492](MySQL.assets/image-20230415111618492.png)
+
+### 不加锁实现一致性数据备份
+
++ 加上选项
+  + --single transcation
+
+![image-20230415111648911](MySQL.assets/image-20230415111648911.png)
 
 
 
 
+
+## 表级锁
+
+### 介绍和分类
+
+![image-20230415150247883](MySQL.assets/image-20230415150247883.png)
+
+
+
+### 表锁
+
++ read lock
+  + 自己和其他客户端都不可以write，但都可以read
++ write lock
+  + 自己可以read和write，其他客户端都不可以
+
+![image-20230415151540175](MySQL.assets/image-20230415151540175.png)
+
+
+
+
+
+### 元数据锁-~解决DML和DDL的冲突~
+
++ 存在没有提交的事务时候，不可以对元数据进行写入操作
+
++ 为了**避免DML与DDL冲突**，保证读写的正确性
++ SHAREAD_READ,与SHAREAD_WRITE 共享
++ EXCLUSIVE与SHAREAD_READ, SHAREAD_WRITE 互斥
+
+![image-20230415153217488](MySQL.assets/image-20230415153217488.png)
+
+
+
+### 意向锁-~解决行锁和表锁的冲突~
+
++ 行锁出现时同时出现、自动加的
+
++ 为了解决**行锁和表锁**的冲突
+
++ 为了避免DML在执行时，加的**行锁和表锁**的冲突，在InnoDB中引入了意向锁，使得表锁不用检查每行数据是否加锁，使用意向锁来减少表锁的检查
+
+![image-20230415154219324](MySQL.assets/image-20230415154219324.png)
+
+![image-20230415154519479](MySQL.assets/image-20230415154519479.png)
+
++ 意向锁和表锁的兼容情况
+
+![image-20230415154001270](MySQL.assets/image-20230415154001270.png)
+
+
+
+## 行级锁
+
+### 介绍
+
++ 行级锁
+  + 不给update、delete该行
++ 间隙锁
+  + 不给在改行前insert
++ 临建锁
+  + 行级锁和间隙锁组合
+
+![image-20230415155926954](MySQL.assets/image-20230415155926954.png)
+
+### 行锁的两种类型-共享锁和排他锁
+
+![image-20230415160155508](MySQL.assets/image-20230415160155508.png)
+
+### 设置行级锁
+
+![image-20230415160355063](MySQL.assets/image-20230415160355063.png)
+
+### 索引与行锁
+
+![image-20230415161044831](MySQL.assets/image-20230415161044831.png)
+
+
+
+### 间隙锁/临建锁
+
++ 间隙锁-防止多个事务并发操作时出现幻读
+
++ next-key锁：临建锁
+
+![image-20230415162028221](MySQL.assets/image-20230415162028221.png)
+
+
+
+
+
+# InnoDB引擎
+
+## 逻辑存储结构
+
++ 每个区的大小为1M，默认情况下，InnoDB存储引擎页大小为16k，即一个区中一共有64个连续的页
++ 为了保证页的连续性，InnoDB存储引擎每次从磁盘申请4-5个区
+
+![image-20230416122627023](MySQL.assets/image-20230416122627023.png)
+
+
+
+
+
+## 架构
+
+### 总架构
+
+![image-20230416122742269](MySQL.assets/image-20230416122742269.png)
+
+
+
+
+
+### 内存架构 In-Memory Structures
+
+> 减小磁盘I/O
+
+
+
+#### Buffer Pool
+
+> 缓冲区
+
+![image-20230416123243887](MySQL.assets/image-20230416123243887.png)
+
+#### Change Buffer
+
+> 更改缓冲区
+
+![image-20230416124116201](MySQL.assets/image-20230416124116201.png)
+
+#### Adaptive Hash Index
+
+> 自适应哈希
+
+![image-20230416123642720](MySQL.assets/image-20230416123642720.png)
+
+#### Log Buffer
+
+> 日志缓冲区
+
+![image-20230416124201356](MySQL.assets/image-20230416124201356.png)
+
+
+
+
+
+### 磁盘架构 On-Disk Structures
+
+#### System Tablespace ==&== File-Per-Table Tablespaces
+
+> 系统表空间
+
+![image-20230416124558192](MySQL.assets/image-20230416124558192.png)
+
+
+
+#### General Tablespaces ==&== Undo Tablespaces ==&== Temporary Tablespaces
+
+> 通用表空间 & 撤销表空间 & 临时表空间
+
+![image-20230416125320433](MySQL.assets/image-20230416125320433.png)
+
+#### Doublewrite Buffer Files ==&== Redo Log
+
+> 双写缓冲区 & 重做日志
+
+![image-20230416125708360](MySQL.assets/image-20230416125708360.png)
+
+### 内存与磁盘之间-数据的传输
+
+![image-20230416131135962](MySQL.assets/image-20230416131135962.png)
+
+
+
+
+
+## 事务原理
+
+### 介绍
+
+![image-20230416131819852](MySQL.assets/image-20230416131819852.png)
+
+![image-20230416163344189](MySQL.assets/image-20230416163344189.png)
+
++ redo log + undo log保证事务一致性
++ MVCC+锁保证事务隔离性
+
+
+
+
+
+### redo log—保证事务持久性
+
+![image-20230416132908869](MySQL.assets/image-20230416132908869.png)
+
+
+
+### undo log—保证事务原子性
+
+![image-20230416133242441](MySQL.assets/image-20230416133242441.png)
+
+
+
+
+
+
+
+## MVCC
+
+> 多版本并发控制
+
+### MVCC基本概念
+
++ 当前读、快照读、MVCC
+  + 使用当前读的语句可以在事务中直接读取当前数据，而不用看事务隔离级别
+
+![image-20230416134248033](MySQL.assets/image-20230416134248033.png)
+
+
+
+### MVCC实现原理
+
+> 三个隐藏字段+undo long版本链+readview
+
+#### 记录隐藏字段
+
++ 事务ID
++ 回滚指针
+
+![image-20230416155128757](MySQL.assets/image-20230416155128757.png)
+
++ ibd2sdi 表名
+  + 查看表空间文件
+
+
+
+#### undo log & undo log版本连
+
+![image-20230416160039730](MySQL.assets/image-20230416160039730.png)
+
+![image-20230416160514223](MySQL.assets/image-20230416160514223.png)
+
+
+
+#### readview
+
+> 用于==当前快照读==应该读取哪个版本
+
+##### 介绍
+
++ max_trx_id 为当前最大事务ID+1
+
+![image-20230416161400486](MySQL.assets/image-20230416161400486.png)
+
+##### 版本链数据访问规则
+
+![image-20230416162301488](MySQL.assets/image-20230416162301488.png)
+
+
+
+##### RC-案例
+
+> 读已提交
+
+![image-20230416162959432](MySQL.assets/image-20230416162959432.png)
+
+
+
+
+
+##### RR-案例
+
+> 可重复读
+
+![image-20230416163140678](MySQL.assets/image-20230416163140678.png)
+
+
+
+
+
+# MySQL管理
+
+## 系统数据库
+
+![image-20230416171524670](MySQL.assets/image-20230416171524670.png)
+
+
+
+
+
+## 常用工具
+
+### mysql
+
++ MySQL客户端工具，-e执行SQL并退出
+
+![image-20230416171954328](MySQL.assets/image-20230416171954328.png)
+
+
+
+### mysqladmin
+
+> MySQL管理工具
+
+![image-20230416172423313](MySQL.assets/image-20230416172423313.png)
+
+
+
+
+
+### mysqlbinlong
+
+> 二进制日志查看工具
+
+![image-20230416172944305](MySQL.assets/image-20230416172944305.png)
+
+
+
+### mysqlshow
+
++ 客户端对象查找工具，查看数据库、表、字段的统计信息和状态等
+
+![image-20230416173411153](MySQL.assets/image-20230416173411153.png)
+
+
+
+### mysqldump
+
+> 数据库备份工具
+
+![image-20230416174055710](MySQL.assets/image-20230416174055710.png)
+
+![image-20230416173956766](MySQL.assets/image-20230416173956766.png)
+
+![image-20230416174718619](MySQL.assets/image-20230416174718619.png)
+
+
+
+### mysqlimprt/source
+
+> 数据导入工具
+
+> mysqlimport只能导入mysqldump -T 中备份的文本文件
+>
+> source用于导入sql文件
+
++ source需要进入到mysql的命令行中进行
+
+![image-20230416175104962](MySQL.assets/image-20230416175104962.png)
+
+![image-20230416175327242](MySQL.assets/image-20230416175327242.png)
 
 
 
