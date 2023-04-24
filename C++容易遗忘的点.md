@@ -76,6 +76,7 @@ const int &r = ci;      //  所有的引用本身都是顶层 const，因为引�
 ## 在类内的static声明需要在类外定义
 
 + 类内的static函数不会有this pointer
++ 在内外定义才会为其分配内存
 
 
 
