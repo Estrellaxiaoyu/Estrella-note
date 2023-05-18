@@ -1130,7 +1130,7 @@
 ### 不加锁实现一致性数据备份
 
 + 加上选项
-  + --single transcation
+  + **--single transcation**
 
 ![image-20230415111648911](MySQL.assets/image-20230415111648911.png)
 
@@ -1217,6 +1217,12 @@
 ### 设置行级锁
 
 ![image-20230415160355063](MySQL.assets/image-20230415160355063.png)
+
++ lock in share mode 是当前读
+
++ for update 是当前读
+
+
 
 ### 索引与行锁
 
