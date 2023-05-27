@@ -200,6 +200,8 @@
 
 ![image-20230328223655749](MySQL.assets/image-20230328223655749.png)
 
+主键约束，唯一约束，外键约束，默认约束，非空约束
+
 ## 演示
 
 + auto_increment
@@ -212,7 +214,7 @@
 
 
 
-## 外键约束
+## 外键约束 
 
 ![image-20230328230321365](MySQL.assets/image-20230328230321365.png)
 
@@ -866,7 +868,7 @@
 
 ## 视图的检查选项 cascaded/local
 
-+ cascaded：级联
++ cascaded：**级联**
   + 会将上层依赖的视图都加上with cascaded check option；
 
 ![image-20230412212525743](MySQL.assets/image-20230412212525743.png)
@@ -1065,6 +1067,17 @@
 ## 语法
 
 ![image-20230413171557581](MySQL.assets/image-20230413171557581.png)
+
+~~~SQL
+delimiter $$
+create trigger tri_name
+	after/before insert/delete/update on table_name for each row
+begin
+	...;
+end;
+$$
+delimiter ;
+~~~
 
 
 
@@ -1339,8 +1352,11 @@
 
 + 两次写
 + innoDB引擎将数据页从Buffer Pool刷新到磁盘前，先将数据页写入到双写缓冲区文件中，便于**系统异常恢复数据**
++ 修复页（例如修复表结构的错误）
 
 ##### redo log（重做日志文件）
+
++ 用于在**刷新脏页的时候**，发送错误时，进行数据恢复使用
 
 + 由重做缓冲区（redo log buffer）以及重做日志文件（redo log）组成
   + 前者在内存中，后者在磁盘中
@@ -1348,7 +1364,7 @@
   + 当时**事务被提交**时将重做日志缓冲刷新到重做日志文件中
   + 当重做日志缓冲池剩余空间小于1/2时，将重做日志缓冲刷新到重做日志文件中
 
-
+**系统异常恢复后，如果要写入的页损坏了，就用两次写的备份恢复这个页，在进行重做（redo）来恢复数据**
 
 
 
