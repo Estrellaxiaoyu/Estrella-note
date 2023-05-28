@@ -66,17 +66,17 @@
 
 
 
-## 条款3：尽可能使用const
+## 条款3：==尽可能使用const==
 
 > 加了mutable的成员变量可能总是被更改，即使在const成员函数内
 
 + 将某些东西声明成const可帮助编译器侦测出错误用法。const可被施加于任何作用域的对象、函数参数、函数返回类型、成员函数本体
 + 编译器强制实施 bitwise constness，但你编写程序时**应该使用 “概念上的常量性” **（conceptual constness）
 + 当 const 和 non-const 成员函数有着实质等价的实现时，令 non-const 版本调用 const 版本**避免代码重复**
-+ const 修饰的 operator* 的返回类型，可以阻止客户因 ”用户自定义类型“而犯错
++ const 修饰的 operator* 的**返回类型**，可以阻止客户因 ”用户自定义类型“而犯错
 
   ~~~c++
-  if(a * b = c) ... 		//愿意其实是做一次比较操作
+  if(a * b = c) ... 		//原意其实是做一次比较操作
   ~~~
 
 
@@ -110,7 +110,7 @@
 ## 条款6：若不想使用编译器自动生成的函数，就该明确拒绝
 
 + 为驳回编译器自动（暗自）提供的机能，可将相应的成员函数声明为private并且不予实现。使用想**Uncopyable**这样的base class也是一种做法
-  + Uncopyable：derived class 继承 Uncopyable 来把自身的默认拷贝/赋值函数给禁止（因为 Uncopyable 的拷贝/复制构造函数时 private 的）
+  + **Uncopyable**：derived class 继承 Uncopyable 来把自身的默认拷贝/赋值函数给禁止（因为 Uncopyable 的拷贝/复制构造函数时 private 的）
 
 
 
@@ -132,7 +132,7 @@
 
 
 
-## 条款8：别让异常逃离析构函数
+## 条款8：==别让异常逃离析构函数==
 
 + 析构函数绝对不要突出异常。如果一个被析构函数调用的函数可能抛出异常，**析构函数应该捕捉任何异常**，然后吞下它们（不传播）或结束程序。
 + 如果用户需要对某个操作函数运行期间抛出异常**做出反应**，那么 class 应该**提供一个普通函数**（下文提供的close()）（而非在析构函数中）执行该操作
@@ -209,7 +209,7 @@ private:
 
 
 
-## 条款11：在 operator= 中处理“自我赋值“
+## 条款11：在 operator= 中==处理“自我赋值“==
 
 + 确保当对象自我赋值时operator= 有良好的行为。其中技术包括比较”来源对象“和”目标对象“的地址、精心周到的语句顺序、以及copy and swap
 
@@ -256,7 +256,7 @@ private:
 ## 条款12：复制对象时勿忘其每一个成分
 
 + Copying 函数应该确保复制 ”对象内的所有成员变量“ 以及 ”所有 base classes 成分“
-+ 不要尝试以某个 copying 函数 实现另一个 copying（比如赋值） 函数。应该将共同机能放进第三个函数中，并由两个copying函数共同调用
++ 不要尝试以某个 copying 函数 实现另一个 copying（比如赋值） 函数。应该将**共同机能**放进第三个函数中，并由两个copying函数共同调用
 
 
 
@@ -278,7 +278,7 @@ private:
 + 复制 RAII 对象必须一并复制它管理的资源，所以资源的 copying 行为决定 RAII 对象的 copying 行为
 + 普遍而常见的 RAII class copying 行为是：**抑制 copying**（继承 Uncopyable base classes）、施行引用计数法（reference counting）。不过其他行为也能被实现
 + 引用计数法—>shared_ptr：可以自定义删除器（客制化析构函数，例如析构操作是释放锁（解开）而不是将锁资源释放）
-+ 复制底部资源（heap上的）：需要进行**深度拷贝**，不论指针或其所指内存都会被复制出一个复件（避免重复delete资源）、
++ 复制底部资源（heap上的）：需要进行**==深度拷贝==**，不论指针或其所指内存都会被复制出一个复件（避免重复delete资源）、
 + 转移底部资源的所有权：确保RAII对象指向一个未加工的资源。即使复制，此时资源的拥有权从被复制物转移到目标物（auto_ptr）
 
 
@@ -307,7 +307,7 @@ private:
 
 
 
-## 条款17：以独立语句将 newed 对象置入智能指针
+## 条款17：==以独立语句将 newed 对象置入智能指针==
 
 + 以独立语句将 newed 对象存储于（置入）智能指针中。如果不这样做，**一旦异常被抛出**，有可能导致**难以察觉的资源泄露**
 
@@ -323,7 +323,7 @@ private:
 
 # 4. 设计与声明
 
-## 条款18：让接口容易被正确使用，不易被误用
+## 条款18：==让接口容易被正确使用，不易被误用==
 
 + 好的接口很容易被正确使用，不容易被勿用。你应该在你的所有接口中努力达成这些性质
 
@@ -341,9 +341,9 @@ private:
 
 + ”促进正确使用“ 的办法包括**接口一致性**（比如string，vector，list等通过调用相同名字的size()获取长度），以及与内置类型的行为兼容
 
-+ ”阻止误用“ 的办法包括**建立新类型**（12月份->Month::Dec()）、**限制类型上的操作**（比如opeator *的返回值类型为const），**束缚对象值**（例如返回智能指针，强制用户使用智能指针），以及消除客户的资源管理责任（将delete和其他操作~引用计数-1~封装起来给用户释放资源，如shared_ptr）
++ ”阻止误用“ 的办法包括**建立新类型**（12月份->Month::Dec()）、**限制类型上的操作**（比如opeator *的返回值类型为const），**束缚对象值**（例如返回智能指针，强制用户使用智能指针），以及**消除客户的资源管理责任**（将delete和其他操作~引用计数-1~封装起来给用户释放资源，如shared_ptr）
 
-+ tr1::shared_ptr 支持定制性删除器（custom deleter）。这可防范DLL问题（new/delete这对操作在不同动态链接库中，shared_ptr会自动调用本模块的delete函数），可被用来自动解除互斥锁（mutexes）等等
++ tr1::shared_ptr 支持**定制性删除器**（custom deleter）。这可**防范DLL问题**（new/delete这对操作在不同动态链接库中，shared_ptr会自动调用本模块的delete函数），可被用来**自动解除互斥锁**（mutexes）等等
 
 
 
@@ -382,7 +382,7 @@ private:
 ## 条款20：宁以 pass-by-reference-to-const 替换 pass-by-value
 
 + 尽量以 pass-by-reference-to-const 替换 pass-by-value。前者通常比较高效，并可避免切割问题（slicing problem）
-  + 切割问题：参数类型为Window w，**如果传递其子类，则其子类的特化信息会被切除**
+  + **==切割问题==**：参数类型为Window w，**如果传递其子类，则其子类的特化信息会被切除**
 + 以上规则**并不适用于内置类型**，以及 STL 的迭代器和函数对象。对它们而言，pass-by-value 往往比较合适
 
 
@@ -402,7 +402,7 @@ private:
 
 ## 条款23：宁以 non-member、non-friend 替换 member 函数
 
-+ 宁可拿non-member non-friend 函数替换 member 函数。这样做可以增加封装性、包裹弹性（packaging flexibility）和技能扩展性
++ 宁可拿non-member non-friend 函数替换 member 函数。这样做可以**增加封装性、包裹弹性（packaging flexibility）和技能扩展性**
 
 ```c++
 class WebBrowser
@@ -452,7 +452,7 @@ public:
 };
 ```
 
-对于上面代码
++ 对于上面代码
 
 ```C++
 Rational result = oneHalf * oneEighth;
@@ -461,7 +461,8 @@ result = oneHalf * 2;
 result = 2 * oneHalf; //有错误
 ```
 
-为了使得第四个赋值也能支持，可以把operator*实现成以下
++ 为了使得第四个赋值也能支持，可以把operator*实现成以下
+  + 此函数可以使用 Rational 的 public 接口来实现功能，就不用声明为 friend
 
 ```C++
 const Rational operator*(const Rational &lhs, const Rational &rhs);
@@ -469,10 +470,10 @@ const Rational operator*(const Rational &lhs, const Rational &rhs);
 
 
 
-## 条款25：考虑写出一个不抛出异常的 swap 函数
+## 条款25：==考虑写出一个不抛出异常的 swap 函数==
 
 + 当 std::swap 对你的类型效率不高时，提供一个swap成员函数，并确定这个函数**不抛出异常**
-+ 如果你提供一个 **member** swap，也该提供一个 **non-member** swap 用来调用前者。对于 **classes**（而非 **template**），也请特化std::swap
++ 如果你提供一个 **member** swap，也该提供一个 **non-member** swap 用来调用前者。对于 **classes**（而非 **template**），也请**特化std::swap**
 + 调用 swap 时应针对 std::swap 使用 using 声明式，然后调用 swap 并且不带任何“命名空间资格修饰”（让编译器自己选择，如果类型匹配，会选择用户自己特化的）
 + 为“用户定义类型”进行 std templates 全特化是好的，但千万不要尝试在std内加入某些对std而言全新的东西
 
@@ -542,19 +543,19 @@ for (int i = 0; i < n; ++i)
 
 因此：
 
-- 你知道赋值成本比“构造+析构”成本低
+- 你知道**赋值成本**比 **“构造+析构” 成本**低
 - 你正在处理代码中效率高度敏感的部分，否则你应该使用做法B
 
 
 
 ## 条款27：尽量少做转型动作
 
-- const_cast通常被用来**将对象的常量性剔除**
-- dynamic_cast主要用来执行“**安全向下转型**”，也就是用来判断某对象是否归属继承体系中的某个类型
-- reinterpret_cast意图执行**低级转型**，实际动作及结果可能取决于编译器，这也就表示它不可移植
+- **const_cast**：通常被用来**将对象的常量性剔除**
+- **dynamic_cast**：主要用来执行“**安全向下转型**”，也就是用来判断某对象是否归属继承体系中的某个类型
+- **reinterpret_cast**：意图执行**低级转型**，实际动作及结果可能取决于编译器，这也就表示它不可移植
   - 允许将任何指针转换为任何其他指针类型。 也允许将任何整数类型转换为任何指针类型以及反向转换。
-- static_cast用来强迫隐式转换，但它无法将const转为non-const
-- 如果可以，尽量避免转型，特别是在注重效率的代码中避免dynamic_casts。如果有个设计需要转型动作，试着发展无需转型的替代设计
+- **static_cast**：用来强迫隐式转换，但它无法将const转为non-const
+- 如果可以，尽量避免转型，特别是在注重效率的代码中避免dynamic_casts。如果有个设计需要转型动作，试着发展无需转型的替代设计——virtual：子类override父类，父类指针指向子类实例
 - 如果转型是必要的，试着将它隐藏于某个函数背后。客户可以调用该函数，而不需要将转型放进他们自己的代码内（应该用 “基于virtual 函数调用” 替代 dynamic_cast）
 - 宁可以C++-style转型，不要使用旧式转型。前者很容易辨认出来，而且也比较有着分门别类的职掌
 
@@ -564,11 +565,11 @@ for (int i = 0; i < n; ++i)
 
 > handles：号码牌，用于获得某个对象
 
-+ **避免返回 handles**（包括 reference 、指针、迭代器）指向内部对象。遵守这个条款可增加封装性，帮助 const 成员函数的行为像个 const，并将发生 “虚拟号码牌” （dangling handles）的可能性降到最低（返回临时对象的内部对象的引用，一旦临时对象销毁，这个引用就是变成了空悬、虚吊（dangling））
++ **避免返回 handles**（包括 reference 、指针、迭代器）**指向内部对象**。遵守这个条款**可增加封装性**，帮助 const 成员函数的行为像个 const，并将发生 “虚拟号码牌” （dangling handles）的可能性降到最低（返回临时对象的内部对象的引用，一旦临时对象销毁，这个引用就是变成了空悬、虚吊（dangling））
 
 
 
-## 条款29：为 “ 异常安全” 而努力是值得的
+## 条款29：==为 “ 异常安全” 而努力是值得的==
 
 + 异常安全函数（Exception-safe functions）即使发生异常也不会泄漏资源或允许任何数据结构败坏。这样的函数区分为三种可能的保证：基本型、强烈型、不抛异常型
   + **基本型**：如果异常被抛出，程序内的任何事务仍然保持在有效的状态下（但是不能预料现实状态，**程序可能处于任何状态**——只要这个状态是合法的）
@@ -579,24 +580,26 @@ for (int i = 0; i < n; ++i)
 
 
 
-## 条款30：透彻了解 inlining 的里里外外
+## 条款30：==透彻了解 inlining 的里里外外==
 
 - inline函数如果起作用了，会在每次调用的时候用实现的代码替换它，所以会**造成程序体积变大**。
-- inline只是向编译器的一个申请，可以明确用inline关键字，也可以在类体内部定义。
+- inline只是向编译器的一个申请，可以**明确用inline关键字**，也可以**在类体内部定义**。
 - template的实例化和inline无关，如果需要template函数为inline，需要显式地声明它。
-- inline函数无法随着程序库的升级而升级。换句话说如果f是程序库内的一个inline函数，客户讲“f函数本体”编进其程序中，一旦程序库设计者决定改变f，所有用到f的客户端程序都必须重新编译。
-- 将大多数inline限制在小型、被频繁调用的函数身上。这可使日后的调试过程和二进制升级更容易，也可使潜在的代码膨胀问题最小化，使程序的速度提升机会最大化。
+- inline函数**无法随着程序库的升级而升级**。换句话说如果f是程序库内的一个inline函数，客户讲“f函数本体”编进其程序中，一旦程序库设计者决定改变f，所有用到f的客户端程序都**必须重新编译**。
+- 将大多数inline**限制在小型、被频繁调用的函数身上**。这可使日后的调试过程和二进制升级更容易，也可使潜在的代码膨胀问题最小化，使程序的速度提升机会最大化。
 - 80-20 法则：一个典型的程序有 80% 的执行时间花费在 20%的代码身上
 
 
 
-## 条款31：将文件间的编译依存关系降到最低
+## 条款31：==将文件间的编译依存关系降到最低==
+
++ **解耦**——编译的时候有时候只需要一个声明而不必把定义编译进去
 
 + 支持 “编译依存性最小化” 的一般构想是：**相依于声明式**，**不要相依于定义式**。基于此构想的两个手段是 Handle classes 和 Interface classes。
 + 程序库头文件应该以 “完全且仅有声明式”（full and declaration-only forms）的形式存在。这种做法不论是否涉及 templates 都适用
   + **Handles classes**：将声明和定义分类编写，声明类和定义类有同名成员函数，声明类通过成员智能指针指向实现类，声明类的成员函数通过这个指针调用定义式中的函数
   + **Interface classes**：父类中通过虚函数 “声明” ，子类继承父类重写虚函数提供 “定义”，通过 factory 函数返回一个指向子类的父类智能指针
-  + 将声明与定义分离，可以**将 “非真正必要之类型定义” 与 客户端之间的编译依存关系去除掉**
+  + 将声明与定义分离，可以**==将 “非真正必要之类型定义” 与 客户端之间的编译依存关系去除掉==**
 
 
 
@@ -672,7 +675,7 @@ class Ellipse : public Shape {...};
 
 
 
-## 条款35：考虑 virtual 函数以外的其他选择
+## 条款35：==考虑 virtual 函数以外的其他选择==
 
 + 场景：假如你打算为游戏内的人物设计一个继承体系。你的游戏属于暴力砍杀类型，剧中人物被伤害或因其他因素而降低健康状态的情况并不罕见。因此，你决定提供一个成员函数healthValue，它会返回一个整数，表示人物的健康程度。由于不同的人物可能已不同的方式计算它们的健康指数，将healthValue声明为virtual似乎是再明白不过的做法。
 
@@ -731,9 +734,9 @@ private:
 
 + 缺点：**降低了封装性**——>如果计算血量，需要依赖non-public的信息，**就需要弱化 class 的封装**，例如 class 可声明这个 non-member 函数为 friends，或为其实现的某一部分提供 public 访问函数
 
-### 方案4-借由tr1::function完成strategy模式
+### 方案4-借由 tr1::function 完成 strategy 模式
 
-+ tr1::function对象的行为就像一般函数指针。这样的对象可接纳“与给定的目标标签格式兼容”的所有可调用物，也就是函数指针、函数对象或成员函数指针。
++ tr1::function 对象的行为就像一般函数指针。这样的对象可接纳“与给定的目标标签格式兼容”的所有可调用物，也就是函数指针、函数对象或成员函数指针。
 
 ```
 class GameCharacter
@@ -756,6 +759,548 @@ private:
 
 
 ## 条款36：绝不重新定义继承而来的 non-virtual 函数
+
++ 绝不重新定义继承而来的non-virtual函数
+
+```C++
+class B
+{
+public:
+	void mf();
+    ...
+};
+class D : public B
+{
+
+};
+D x;
+B *pb = &x;
+pb->mf();//调用B::mf
+D *pd = &x;
+pd->mf();//调用D::mf
+```
+
++ 在D中重载non-virtual的B类对象中的函数，其实已经违反了在 public 继承下每个D is-a B的约束。即对于non-virtual的接口，继承类应该和基类行为是一致的，否则就不应该设计成non-virtual接口。
+
+
+
+## 条款37：绝不重新定义继承而来的缺省参数值
+
++ virtual函数系动态绑定，而缺省参数值却是静态绑定。
+
++ 举个例子
+
+```C++
+class Shape
+{
+public:
+	enum ShapeColor{Red, Green, Blue};
+    virtual void draw(ShapeColor color = Red) const = 0;
+};
+class Rectangle : public Shape
+{
+public:
+	virtual void draw(ShapeColor color = Green) const = 0;
+};
+```
+
++ 有以下代码
+
+```C++
+Shape *ps;
+Shape *pc = new Circle;
+Shape *pr = new Rectangle;
+```
+
++ 用 pc->draw() 的时候，采用的默认参数是 Red，是 Shape 类的默认参数，而不是 Derived 的类的默认参数，因为默认参数是静态编译期间绑定的。
+
++ 即使把 Base class 和 Derived class 设计成相同的默认参数，**如果某一天要修改这个参数，得两个类都需要修改**。
+
++ 这个问题可以通过 NVI 方法来避免，把函数功能抽象成 private 的 virtual 函数，然后把缺省的默认参数移到 non-virtual 的 public 函数中。
+
+  ~~~C++
+  class Shape
+  {
+  public:
+  	enum ShapeColor{Red, Green, Blue};
+  	void draw(ShapeColor color = RED){
+          doDraw(color);
+      }
+  private:
+      virtual void doDraw(ShapeColor color) const = 0;
+  };
+  class Rectangle : public Shape
+  {
+  public:
+  	...    
+  private:
+  	virtual void doDraw(ShapeColor color) const;
+  };
+  ~~~
+
+
+
+## 条款38：通过==复合==塑模出 has-a 或 “根据某物实现出”
+
++ 复合 （composition）的意义和 public 继承完全不同
++ 在应用域（application domain），复合意味着 has-a（有一个）。在实现域（implementation domain），复合意味着 is-implemented-in-terms-of
+
++ 例如，我们希望基于std::list来实现一个set，可以，在一个set类里面定义一个std::list作为内部成员，来实现set。
+
+
+
+## 条款39：明智而审慎地使用 private 继承
+
++ Private 继承意味着 is-implemented-in-terms-of（根据某物实现出）。它**通常比复合（composition）的级别低**。但是当 derived classes 需要访问 protected base class 的成员，或需要重新定义一个或多个 virtual 函数时，这么设计是合理的
++ 和复合（composition）不同，private 继承可以造成 **empty base 最优化**（EBO：empty base optimization）。这对致力于 “对象尺寸最小化” 的程序库开发者而言，可能很重要
++ 复合和 private 继承都意味着 is-implemented-in-terms-of，但复合比较容易理解，所以无论什么时候，**只要可以，你还是应该选择复合**
+
+
+
+## 条款40：明智而审慎地使用多重继承
+
+- 多重继承比单一继承复杂。它可能导致新的歧义性，以及对virtual继承的需要
+- virtual继承会增加大小、速度、初始化（及赋值）复杂度等等成本。如果virtual base classes不带任何数据，将是最具使用价值的情况
+- 多重继承的确有正当用途。其中一个情节涉及 “**public 继承某个Interface class**” 和 “**private 继承某个协助实现的class**” 的两相组合
+  - 和条款31相似，不过子类重写的操作交给 private 继承的 class
+
+
+
+# 7. 模板与泛型编程
+
+## 条款41：了解隐式接口和编译期多态
+
+- class 和 templates 都支持接口（interfaces）和多态（polymorphism）
+- 对 classes 而言**接口是显示的**（explicit），以函数签名为中心，多态则是通过 virtual 函数发生于运行期——**运行期多态**
+- 对 template 参数而言，**接口是隐式的**（implici），**奠基于有效表达式**。多态则是通过 template 具现化和函数重载解析（function overloading resolution）发生于编译期——**编译器多态**
+
+
+
++ 对于template编程，隐式接口和编译期多态移到了前头，例如
+
+```C++
+template<typename T>
+void doProcessing(T &W)
+{
+  if (w.size() > 10 && w != someNastyWidget)
+  {
+  	T temp(w);
+    temp.normalize();
+    temp.swap(w);
+  }
+};
+```
+
+- w必须支持哪一种接口，系由template中执行于w身上的操作来决定。本例看来w的类型T好像必须支持size，normalize和swap成员函数、copy构造函数、不等比较。
+- 凡涉及w的任何函数调用，例如operator>和operator!=，有可能造成template具现化，使得这些调用得以成功。这样的具现行为发生在**编译期**。“以不同的template参数具现化function templates”会导致调用不同的函数，这是**编译期多态**。
+
+
+
+## 条款42：了解 typename 的双重意义
+
+- 声明 template 参数时，前缀关键字 class 和 typename 可互换
+
+- 请使用关键字 typename 标识**嵌套从属类型**名称；但不得在 **base class lists** 或 **member initialization list** 内以它作为 base class 修饰符
+
+  ```C++
+  template<typename C>               //允许使用typename或class
+  void f (const C &container,        //不允许使用typename
+  		typename C::iterator iter) //一定要使用typename
+  ```
+
+  因为C::iterator看起来有可能是类型，也有可能是成员变量，所以，要**明确告诉编译器**。
+
+
+
+## 条款43：==学习处理模板化基类的名称==
+
+```C++
+class MsgInfo{...};
+template<typename Company>
+class MsgSender
+{
+public:
+	...
+    void sendClear(const MsgInfo &info)
+    {
+  		std::string msg;
+        Company c;
+        c.sendCleartext(msg);
+    }
+    void sendSecret(const MsgInfo &info) {...}
+};
+
+template<typename Company>
+class LoggingMsgSender : public MsgSender<Company>
+{
+public:
+	...
+    void sendClearMsg(const MsgInfo &info)
+    {
+  		将"传送前"的信息写至log;
+        sendClear(info);  //调用base class函数：这段代码无法通过编译
+        将"传送后"的信息写至log;
+	}
+}
+```
+
++ 之所以无法通过编译是因为编译器无法确认 MsgInfo\<Company> 中是否有 sendClear() 函数，也就**不会进入父类作用域**去查看是否有这个函数
+  + 因为就算一般（泛化）的 template 中确实是有sendClear() 函数，但可能有全特化版本，而这个版本没有 sendClear() 函数
+
+**解决方案有三个：**
+
+在 derived class templates ——>假定这个函数被继承
+
+- 在sendClear之前加上**this操作符**
+
+```C++
+this->sendClear(info);
+```
+
+- 使用**using声明式**
+
+```C++
+using MsgSender<Company>::sendClear;
+```
+
+- 明白**指出被调用的函数位于base class**内
+  - 此操作的明确资格修饰（explicit qualification）会关闭 “ virtual ” 绑定行为
+
+```C++
+MsgSender<Company>::sendClear(info);
+```
+
+
+
+## 条款44：将与参数无关的代码抽离 templates
+
++ Templates 生成多个 classes 和多个函数，所以任何 template 代码都不该与某个造成膨胀的 template 参数产生相依关系
++ 因**非类型模板参数**（non-type template parameters）而造成的代码膨胀，往往可消除，做法是以函数参数或class成员变量替换template参数
+  + 如以下代码示例
++ 因**类型参数**（type parameters）而造成的代码膨胀，往往可降低，做法是让带有**完全相同二进制**表述的具现类型**共享实现码**
+  + 例如 vector\<int> 和 vector\<long> 的成员函数可能完全相同，会**使用唯一一份底层实现**
+
+代码示例：
+
++ 对于template class或者template function，其间的代码重复可能不是很容易能看出来，需要对调用情况进行分析，可能会实现仅仅是参数不同的函数，例如
+
+```C++
+template<typename T,
+		 std::size_t n>
+class SquareMatrix
+{
+public:
+    void invert();
+};
+
+SquareMatrix<double, 5> sm1; //调用SquareMatrix<double, 5>::invert
+sm1.invert();
+SquareMatrix<double, 10> sm2; //调用SquareMatrix<double, 10>::invert
+sm2.invert();
+```
+
++ 解决方案是写一个带参数的invert函数，然后，public函数的接口调用带参数的invert函数。
+  + **减少了具现模板时的代码膨胀**，将具现**模板间的一些相同机能**交由其他类/函数模板实现，再继承调用，这样都会使用一份代码，而不需要每次模板具现的时候都有一份重复代码
+
+```C++
+template<typename T>
+class SquareMatrixBase							//将与参数是std::size_t n无关的代码抽离了出来
+{												
+protected:
+	void invert(std::size_t matrixSize);
+};
+template<typename T, std::size_t n>
+class SquareMatrix : private SquareMatrixBase<T>
+{
+private:
+	using SquareMatrixBase<T>::invert;			//避免覆盖base版的invert
+public:
+	void invert() {this->invert(n);}			//this是为了假定invert被继承——条款43
+};
+```
+
+
+
+## 条款45：运用==成员函数模板==接受所有兼容类型
+
++ 同一个 template 的不同具现体（instantiations）之间并不存在什么与生俱来的固有关系
+  + 这里意指如果以带有 base-derived 关系的 B，D 两类型**分别具现化某个 template**，产生出来的两个具现==**并不带有 base-derived 关系**==
+
++ 使用 member function templates（**成员函数模板**）生成 “可接受所有兼容类型” 的函数——这里用倾向使用 class
+
+```C++
+template<typename T>
+class SmartPtr
+{
+public:
+	explicit SmartPtr(T *realPtr);
+    ...
+};
+SmartPtr<Top> pt1 = 
+	SmartPtr<middle>(new Middle); 	//将smartPtr<middle>转换成SmartPtr<Top>
+SmartPtr<Top> pt2 = 
+	SmartPtr<Bottom>(new Bottom);
+SmartPtr<const Top> pct2 = pt1;
+```
+
++ 解决方案
+
+```C++
+template<typename T>
+class SmartPtr
+{
+public:
+	template<typename U>
+   	SmartPtr(const SmartPtr<U> &other)
+    	: heldPtr(other.get()) {...}
+    T *get() const {return heldPtr;}
+private:
+	T *heldPtr;
+};
+```
+
++ 使用成员初值列来初始化 SmartPtr 之内类型为 T\* 的成员变量，并以类型为 U\* 的指针作为初值，这个行为只有当 “存在某个隐式转换**可将一个U*指针转换成一个T*指针**” 才能通过编译。
+
++ 运用成员函数模板接受所有兼容类型——这里是构造函数的示例
+
+  ~~~C++
+  template<class T>
+  class shared_ptr {
+  public:
+  	template<class Y>									//构造,来自任何类型的
+  	 explicit shared_ptr(Y* p);							//内置指针
+  	template<class Y>
+  	 shared_ptr(shared_ptr<Y> const&r);					//或shared—_ptr
+  	template<class Y>
+  	 explicit shared_ptr<Y>(weak_ptr<Y> const&r);		//或weak_ptr
+  	template<class Y>
+  	 explicit shared_ptr<Y>(auto_ptr<Y>& r);			//或auto_ptr
+  	template<class Y>									//赋值,来自任何兼容的
+  	 shared_ptr& operator== (shared_ptr<Y> const& r);	//shared_ptr
+  	template<class Y>
+  	 shared_ptr& operator== (auto_ptr<Y> &r);			//或auto_ptr
+      ...
+  };
+  ~~~
+
++ 在 class 内声明泛化 copy 构造函数，并**不会阻止编译器生成自己的 copy 构造函数**，所以，如果你想要控制 copy 构造的方方面面，你必须**同时声明泛化 copy 构造函数**和**正常的 copy 构造函数**。相同规则也适用于赋值操作。
+
+  ~~~C++
+  template<class T>
+  class shared_ptr {
+  public:
+      shared_ptr(shared_ptr const&r);						//copy构造函数
+  	template<class Y>
+  	shared_ptr(shared_ptr<Y> const&r);					//泛化copy构造函数
+      
+  	shared_ptr& operator== (shared_ptr<Y> const& r);	//copy assignment
+      template<class Y>
+  	shared_ptr& operator== (shared_ptr<Y> const& r);	//泛化copy assignment
+      ...
+  };
+  ~~~
+
+  
+
+## 条款46：需要类型转换时请为模板定义非成员函数
+
++ 与条款24中的不同：加入了模板
+
+~~~C++
+template<typename T>
+class Rational {
+public:
+	Rational(const T& numerator = 0, const T& denominator = 1);
+	const T numerator() const;
+	const T denominator() const;
+	...
+}
+
+template<typename T>
+const Rational<T> operator* (const Rational<T>& lhs, const Rational<T>& rhs)
+{ ... }
+~~~
+
+~~~C++
+Rational<int> oneHalf(1, 2);
+Rational<int> result = oneHalf * 2		//错误，无法通过编译
+~~~
+
++ oneHalf 可以推导出类型为 Rational\<int>
+
++ 而 2 不能推出Rational\<int>，因为首先要用临时对象并调用 Rational 的构造函数来构建，然而此时 Rational\<T> 还未具现化，因此无法通过编译
+
++ 解决方法是让`const Rational<T> operator* (const Rational<T>& lhs, const Rational<T>& rhs)`这个函数成为类的 friend，当 **onehalf 具现化类**的时候**这个函数也被具现化**，上述的 2 可以转化为 创建临时对象并调用 Rational 的构造函数 (2) 来构建
+
+  + 这个 friend 函数要在类中将定义式也附上，不然连接器找不到它，而外部加上作用域的定义是行不通的
+
+  + 如果定义比较复杂，可以调用外部辅助实现——>接口和实现分离，在接口函数中调用实现函数
+
+    ~~~C++
+    //Rational.h
+    template<typename T> class Rational;	//声明Rational template
+    template<typenaem T>
+    const Rational<T> doMultiply(const Rational<T>& lhs, const Rational<T>& rhs);
+    
+    template<typename T>
+    class Rational {
+     public:
+        ...
+     friend
+    	const Rational<T> operator*(const Rational<T>& lhs, const Rational<T>& rhs){
+            return doMultiply(lhs, rhs);
+        }
+    };
+    ~~~
+
+  + **一些**编译器要求把所有 template 的定义式放进头文件内——需要的话就将 doMultiply() 定义式也写在头文件
+
+    + operator* 的定义式就是 doMultiply()
+
++ 在一个class template 内，template 名称可以省略
+
+
+
+## 条款47：请使用 ==traits classes 表现类型信息==
+
+- Traits classes 使得“类型相关信息”在编译期可用。它们以 templates 和 “templates 特化” 完成实现
+
+STL迭代器分类：
+
+- Input迭代器：只能向前移动，一次一步，客户只可读取它们所指的东西，而且只能读取一次。
+- Output迭代器：只能向前移动，一次一步，客户只可涂写它们所指的东西，而且只能涂写一次。
+- forward迭代器：这种迭代器可以做前述两种分类能做的每件事情，而且可以读或写其所指物一次以上。
+- bidirectional迭代器：它除了可以向前移动，还可以向后移动。STL的list迭代器就属于这一分类，set，multiset，map和multimap的迭代器也都是这一分类。
+- random access迭代器：可以在常量时间内向前或向后跳跃任意距离。vector，deque和string提供的迭代器都是这一分类。
+
+在STL中有advance函数，可以把迭代器按照某个距离进行移动，声明如下：
+
+```C++
+template<typename IterT, typename DistT>
+void advance(IterI &iter, DistT d)
+{
+  if (iter is a random access iterator)
+  {
+    iter += d;
+  }
+  else
+  {
+    if (d >= 0) {while(d--) ++iter;}
+    else {while (d++) --iter;}
+  }
+}
+```
+
+c++中实现相关原理如下：
+
+```C++
+template <typename IterI>
+struct iterator_traits;
+
+template<...>
+class deque
+{
+public:
+	class iterator
+    {
+  	public:
+    	typedef random_access_iterator_tag iterator_category;
+    }
+};
+
+template<...>
+class list
+{
+public:
+	class iterator
+    {
+  	public:
+    	typedef bidirectional_iterator_tag iterator_category;
+	};
+};
+
+对于iterator_traits
+template<typename IterT>
+struct iterator_traits
+{
+	typedef typename IterT::iterator_category iterator_category;
+};
+
+对于内置指针，需要特化一个版本出来
+template<typename IterT>
+struct iterator_traits<IterT *>
+{
+  typedef random_access_iterator_tag iterator_category;
+};
+```
+
++ if **在运行期才确定**，而**模板需要在编译阶段具现**，所以下面 if 语句不能通过编译
+
+~~~C++
+template<typename IterT, typename DistT>
+void advance(IterT &iter, DistT d)
+{
+  if (typeid(typename std::iterator_traits<IterI>::iterator_category) == typeid(std::random_access_iterator_tag))
+};		//if 在运行期才确定，而模板需要在编译阶段具现，所以下面 if 语句不能通过编译
+~~~
+
+- 建立一组重载函数或函数模板，彼此间的差异只在于各自的traits参数。
+- 建立一个控制函数或函数模板，它调用上述那些劳工函数并传递traits class所提供的信息。
+- 整合重载技术后，**==traits classes 有可能在编译器对类型执行 if...else 测试==** ——> 模板元（TMP：Template metaprogramming）
+
+~~~C++
+template<typename IterT, typename DistT>
+void doAdvance(IterT &iter, DistT d,
+				std::random_access_iterator_tag)
+{
+  iter += d;
+}
+
+template<typename IterT, typename DistT>
+void doAdvance(IterT &iter, DistT d, std::bidirectional_iterator_tag)
+{
+  if (d >= 0) {while (d--) ++iter;}
+  else {while(d++) --iter;}
+}
+template<typename IterT, typename DistT>
+void doAdvance(IterT &iter, DistT d, std::input_iterator_tag)
+{
+  if (d < 0)
+  {
+      throw std::out_of_range("Negative distance");
+  }
+  while(d--) ++iter;
+}
+
+template<typename IterT, typename DistT>
+void advance(IterT &iter, DistT d)
+{
+  doAdvance(iter, d, typename std::iterator_traits<IterT>::iterator_category());
+}
+~~~
+
+
+
+## 条款48：认识 template 元编程
+
+- Template metaprogramming (TMP，模板元编程)可将工作由运行期移往编译期，因而得以实现早期错误侦测和更高的执行效率
+- TMP可被用来生成“基于政策选择组合”的客户定制代码，也可用来避免生成对某些特殊类型并不适合的代码
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
