@@ -64,7 +64,7 @@
 
   有了consts、enums和inlines，我们对预处理器的需求降低了，但是不等于没有。#include仍然是必需品，而#ifdef/#ifndef也继续扮演控制编译的重要角色。
 
-
++ Static 成员必须在 class 定义式之外被定义（除非它是 const 而且是整数型
 
 ## 条款3：==尽可能使用const==
 
@@ -294,6 +294,8 @@ private:
 ## 条款16：成对使用 new 和 delete 时要采用相同形式
 
 + 如果你在new表达式中使用[]，必须在相应的 delete 表达式中也使用[]。如果你在 new 表达式中不使用[]，一定不要在相应的 delete 表达式中使用[]
+
+  + 动态分配的 arrays 可能包含额外的空间存放元素
 
 + 为避免诸如此类的错误，最好尽量不要对数组形式做 typedefs 动作
 
@@ -575,6 +577,7 @@ for (int i = 0; i < n; ++i)
   + **基本型**：如果异常被抛出，程序内的任何事务仍然保持在有效的状态下（但是不能预料现实状态，**程序可能处于任何状态**——只要这个状态是合法的）
   + **强烈保证型**：如果异常被抛出，程序状态不改变；如果函数成功，则完全成功，如果函数失败，程序会回复到 “调用函数之前” 的状态
   + **不抛掷（nothrow）保证**：承诺绝不抛出异常，因为它们总是能够完成它们原先承诺的功能。作用于**内置类型**（例如 ints，指针等等）身上的所有操作都提供 nothrow 保证。这是异常安全码中一个**必不可少的关键基础材料**
+    + **在函数名后面加 throw()** 括号内为空
 + “强烈保证” 往往能够以 copy-and-swap 实现出来，但 “强烈保证” 并非对所有函数都可实现或具备现实意义
 + 函数提供的 “异常安全保证” 通常最高只等于其所调用之各个函数的 “异常安全保证” 最低者
 
@@ -638,11 +641,11 @@ public:
 Derived d;
 int x;
 ...
-d.mf1(); //没问题，调用Dervied::mf1
-d.mf1(x); //错误，因为Derived::mf1遮掩了Base::mf1
-d.mf2(); //没问题，调用Base::mf2
-d.mf3(); //没问题，调用Dervied::mf3
-d.mf3(x); //错误！因为Derived::mf3遮掩了Base::mf3
+d.mf1(); 	//没问题，调用Dervied::mf1
+d.mf1(x); 	//错误，因为Derived::mf1遮掩了Base::mf1
+d.mf2();	//没问题，调用Base::mf2
+d.mf3(); 	//没问题，调用Dervied::mf3
+d.mf3(x); 	//错误！因为Derived::mf3遮掩了Base::mf3
 ```
 
 - 如果你正在使用public继承而又不继承那些重载函数，就是违反Base和derived classes之间的is-a关系，而is-a是public的基石。
@@ -730,7 +733,7 @@ private:
 };
 ```
 
-+ 优点：**运用函数指针替换 virtual 函数**， “每个对象可各自拥有自己的健康计算函数” 和 “可在运行期间改变计算函数”
++ 优点：**运用函数指针替换 virtual 函数**， “每个对象可**各自拥有**自己的健康计算函数” 和 “可在运行期间改变计算函数”
 
 + 缺点：**降低了封装性**——>如果计算血量，需要依赖non-public的信息，**就需要弱化 class 的封装**，例如 class 可声明这个 non-member 函数为 friends，或为其实现的某一部分提供 public 访问函数
 
@@ -1288,25 +1291,166 @@ void advance(IterT &iter, DistT d)
 
 
 
+# 8. 定制 new 和 delete
+
+## 条款49：了解 ==new-handler== 的行为
+
+- set_new_handler 允许客户指定一个函数，在**内存分配无法获得满足时被调用**
+  - operator new 可能不止一次分配内存，并在每次失败后调用 new-handling 函数
+- Nothrow new 是一个颇为局限的工具，因为它只适用于内存分配；**后继**的构造函数调用**还是可能抛出异常**
 
 
 
++ 如果父类里面有 static 成员变量，想要子类继承时都有一份独有的 static 成员变量，可以让父类变成模板（实际上没有地方用到），子类在继承的时候将模板参数设定为本身，**Template 机制会自动为每一个 T 生成一份 static 成员**
 
 
 
++ 设计良好的 new-handler 函数可以有以下选择：
+  + 让更多内存可被使用
+  + 安装另一个 new-handler
+  + 卸除 new-handler
+  + 抛出 bad_alloc
+  + 不返回
 
 
 
+## 条款50：了解 new 和 delete 的合理替换时机
+
+- 有许多理由需要写个自定的new和delete，包括改善效能、对heap运用错误进行调试、收集heap使用信息
+  - 用来检测运用上的错误
+  - 为了强化效能
+  - 为了收集使用上的统计数据
+  - 为了增加分配和归还的速度
+  - 为了降低缺省内存管理器带来的空间额外开销
+  - 为了弥补缺省内存分配器中的非最佳**==齐位==**
+  - 为了将相关对象成簇集中
+  - 为了获得非传统行为
 
 
 
+## 条款51：编写 new 和 delete 时需固守常规
+
++ operator new 应该**内含一个无穷循环**，并在其中尝试分配内存，如果它**无法满足内存需求**，就应该**调用new-handler**。它也应该有能力处理任何**0 bytes申请**。Class专属版本则还应该处理“比正确大小更大的（错误）申请” ——> 调用标准 operator new
+
++ operator delete应该在**收到null指针时不做任何事**。Class专属版本则还应该处理“比正确大小更大的（错误）申请” ——> 调用标准operator delete
+
+  ~~~C++
+  class Base {
+  public:
+  	static void* operator new(std::size_t size) throw(std::bad_alloc);
+  	static void operator delete(void* rawMemory, std::size_t size) throw();
+  	...
+  };
+  
+  void* Base::oeprator new(std::size_t size) throw(std::bad_alloc)
+  {
+  	if(size != sizeof(Base))			//如果大小错误
+  		return ::operator new(size);	//令标准的operator new起而处理
+  	...									//否则在这里处理
+  }
+  
+  void Base::operator delete(void* rawMemory, std::size_t size) throw()
+  {
+  	if(rawMemory == 0) return;			//检查null指针
+  	if(size != sizeof(Base))			//如果大小错误
+  	{
+  		::operator delete(size);		//operator delete处理此以申请
+  		return;
+  	}
+  	现在，归还rawMemory所指内存
+  	return;
+  }
+  ~~~
 
 
 
+## 条款52：写了 placement new 也要写 placement delete
+
++ 当你写一个 **placement** operator new，请确定也写出了对应的 **placement** operator delete。如果没有这样做，你的程序可能会发生隐微而时断时续的内存泄漏
+
++ 当你声明 placement new 和 placement delete，请确定**不要无意识（非故意）地遮盖它们的正常版本**
+
+  + 对于撰写内存分配函数，你需要记住的是，缺省的情况下 C++ 在 global 作用域下提供以下形式的 operator new、
+
+    ~~~C++
+    void* operator new(std::size_t) throw(std::bad_alloc);				//normal new
+    void* operator new(std::size_t, void*) throw();						//placement new
+    void* operator new(std::size_t, const std::nothrow_t&) throw();		//nothrow new
+    ~~~
+
+  + 一个简单的做法是，建立一个 base class，内含所有正常形式的 new 和 delete
+
+    ~~~C++
+    class StandardNewDeleteForms {
+    public:
+    	//normal new/delete
+    	static void* operator new(std::size_t size) throw(std::bad_alloc)
+    	{ return ::operator new(size); }
+    	static void operator delete(void* pMemory) throw()
+    	{ ::operator delete(pMemory); }
+    	
+    	//placement new/delete
+    	static void* operator new(std::size_t size, void* ptr) throw()
+    	{ return ::operator new(size, ptr); }
+    	static void operator delete(void* pMemory, void* ptr) throw()
+    	{ ::operator delete(pMemory, ptr); }
+    	
+    	//nothrow new/delete
+    	static void* operator new(std::size_t size, const std::nothrow_t& nt) throw(std::bad_alloc)
+    	{ return ::operator new(size, nt); }
+    	static void operator delete(void* pMemory, const std::nothrow_t&) throw()
+    	{ ::operator delete(pMemory); }
+    };
+    
+    class Widget:public StandardNewDeleteForms {
+    public:
+    	using StandardNewDeleteForms::operator new;				//让这些形式可见
+    	using StandardNewDeleteForms::operator delete;
+    	
+    	static void* operator new(std::size_t size, 			//添加一个自定的placemet new
+    							 std::ostream& logStream)
+    		throw(std::bad_alloc);
+    	static void* operator delete(void* pMemory,				//添加一个自定的placemet delete
+    								std::ostream& logStream)
+    		throw();
+    	...
+    };
+    ~~~
+
+    
+
+# 9. 杂项讨论
+
+## 条款53：不要忽略编译器的警告
+
++ 严肃对待编译器发出的警告信息。努力在你的编译器的最高（最严苛）警告级别下争取 “无任何警告” 的荣誉
++ 不要过度依赖编译器的报警能力，因为不同的编译器对待事情的态度并不相同。一旦移植到另一个编译器上，你原本依赖的警告信息有可能消失
 
 
 
+## 条款54：让自己熟悉包括 TR1 在内的标准程序库
 
+> TR1：Technical Report 1
+
+- STL
+- Iostreams
+- 国际化支持
+- 数值处理
+- 异常阶层体系
+- C89标准程序库
+
+上面的分类应该是比较老的分类了，最新的应该包含C++11和C++14的标准程序库了。
+
++ TR1 自身知识一份规范。为获得 TR1 提供的好处，你需要一份实物。一个好的实物来源是 Boost
+
+
+
+## 条款55：让自己熟悉 Boost
+
++ Boost 是一个社群，也是一个网站。致力于免费、源码开放、同僚复查的 C++ 程序库开发。Boost 在 C++ 标准化过程中扮演深具影响力的角色
++ Boost 提供许多 TR1 组件实现品，以及其他许多程序库
+
++ Boost 是否需要熟悉？看 google 代码规范是推荐使用其中一部分的，觉得还是有必要看看。
 
 
 
