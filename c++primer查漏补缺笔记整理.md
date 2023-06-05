@@ -2137,9 +2137,11 @@ auto p2 = p.release()	//正确：但我们必须记得delete(p);
 - **移动构造函数**：
   - 第一个参数是该类类型的一个引用，关键是，这个引用参数是一个**右值引用**。
   - `StrVec::StrVec(StrVec &&s) noexcept{}`
+  - 移动构造必须加上noexcept，否则vector不会使用移动构造，依然使用拷贝构造。
   - 不分配任何新内存，只是接管给定的内存。
   
 - **移动赋值运算符**：
+  
   - `StrVec& StrVec::operator=(StrVec && rhs) noexcept{}` 
   
 - 移动右值，拷贝左值。
