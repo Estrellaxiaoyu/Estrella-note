@@ -1889,7 +1889,7 @@ shared_ptr<int> p2(new int(1024));		//正确：使用了直接初始化
 
 
 
-## 智能指针——ret()函数配合unique()函数
+## 智能指针——reset()函数配合unique()函数
 
 ~~~
 p = new int[1024];			//错误：不能用指针赋予shared_ptr——和shared_ptr初始化一样
